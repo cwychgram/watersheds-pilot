@@ -50,6 +50,8 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
   
   if(nrow(lulc2map_df) > 0) {
     leafletProxy("map_lulc", session) %>%
+      clearGroup(group = "LULC") %>%
+      removeControl(layerId = "LULC_legend") %>%
     addStarsImage(lulc2map, colors = pal_lulc, group = "LULC") %>%
     addLegend(colors = c("#397d49","#88B053","#e49635","#dfc35a","#c4281b","#a59b8f"),
               labels = c("Trees", "Grass", "Crops", "Shrub/Scrub", "Built", "Bare"),
