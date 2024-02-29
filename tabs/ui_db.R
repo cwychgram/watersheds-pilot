@@ -13,18 +13,22 @@ ui_db <- fluidPage(
                   choices = NULL,
                   width = "100%"
       ),
-      # sliderInput("select_yr",
-      #             label = "Select a year:",
-      #             value = max(lulc$YEAR),
-      #             min = min(lulc$YEAR),
-      #             max = max(lulc$YEAR),
-      #             width = "100%"),
-      sliderInput("select_mo",
-                  label = "Select a month:",
-                  value = 1,
-                  min = 1,
-                  max = 12,
-                  width = "100%")
+      sliderTextInput("select_yr",
+                      label = "Select a year:",
+                      choices = sort(unique(lulc$YEAR)),
+                      selected = max(lulc$YEAR),
+                      grid = TRUE,
+                      animate = TRUE,
+                      width = "100%"
+      ),
+      sliderTextInput("select_mo",
+                      label = "Select a month:",
+                      choices = 1:12,
+                      selected = 1,
+                      grid = TRUE,
+                      animate = TRUE,
+                      width = "100%"
+      )
     ),
     mainPanel(
       width = 9,
@@ -36,6 +40,14 @@ ui_db <- fluidPage(
         column(
           width = 6,
           leafletOutput("map_ndvi")
+        )
+      ),
+      fluidRow(
+        column(width = 6,
+               plotlyOutput("pie")
+        ),
+        column(width = 6,
+               # plotlyOutput("graph")
         )
       )
     )

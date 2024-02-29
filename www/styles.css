@@ -16,3 +16,7 @@
 .navbar-default .navbar-brand:hover {
   color: #FFFFFF;
 }
+
+.irs-grid-pol.small {
+  height: 0px;
+}

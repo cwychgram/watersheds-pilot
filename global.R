@@ -1,10 +1,13 @@
+library(data.table)
 library(dplyr)
+library(leafem)
 library(leaflet)
 library(leaflet.extras)
 library(plotly)
 library(sf)
 library(shiny)
 library(shinyWidgets)
+library(stars)
 library(stringr)
 library(tidyr)
 
@@ -54,3 +57,5 @@ library(tidyr)
 # st_write(ws, "data/ws-pilot-control.shp", driver = "ESRI Shapefile")
 
 ws <- st_read("data/ws-pilot-control.shp")
+
+lulc <- fread("data/babile-gutu-lulc.csv")
