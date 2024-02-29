@@ -1,0 +1,18 @@
+@font-face { 
+  src: url(fonts/Gentona/GentonaBook.otf);
+  font-family: Gentona-Book; 
+}
+
+* {
+  font-family: Gentona-Book;
+}
+
+.navbar-default {
+  background-color: #002D72;
+}
+
+.navbar-default .navbar-brand,
+.navbar-default .navbar-brand:focus, 
+.navbar-default .navbar-brand:hover {
+  color: #FFFFFF;
+}
