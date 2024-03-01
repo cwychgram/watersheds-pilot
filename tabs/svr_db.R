@@ -144,6 +144,9 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
         lulc2graph_2019, lulc2graph_2020, lulc2graph_2021, 
         lulc2graph_2022, lulc2graph_2023)
       
+      lulc2graph_all <- lulc2graph_all %>%
+        mutate(LULC = factor(LULC, levels = c("Trees", "Grass", "Crops", "Shrub/Scrub", "Built", "Bare")))
+      
       x <- list(
         title = "<b>Year</b>"
       )
