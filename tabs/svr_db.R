@@ -66,42 +66,105 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
   
   output$pie <- renderPlotly({
     
-    lulc2pie <- data.frame(LULC = c("Trees", "Grass", "Crops", "Shrub/Scrub", "Built", "Bare"),
-                           PCT = c(sum((lulc2map$LULC == 1) == TRUE, na.rm = TRUE) / sum(!is.na(lulc2map$LULC)) * 100,
-                                   sum((lulc2map$LULC == 2) == TRUE, na.rm = TRUE) / sum(!is.na(lulc2map$LULC)) * 100,
-                                   sum((lulc2map$LULC == 3) == TRUE, na.rm = TRUE) / sum(!is.na(lulc2map$LULC)) * 100,
-                                   sum((lulc2map$LULC == 4) == TRUE, na.rm = TRUE) / sum(!is.na(lulc2map$LULC)) * 100,
-                                   sum((lulc2map$LULC == 5) == TRUE, na.rm = TRUE) / sum(!is.na(lulc2map$LULC)) * 100,
-                                   sum((lulc2map$LULC == 6) == TRUE, na.rm = TRUE) / sum(!is.na(lulc2map$LULC)) * 100))
-    
-    lulc2pie$PCT <- round(lulc2pie$PCT, 1)
-    
-    lulc2pie <- lulc2pie[lulc2pie$PCT != 0, ]
-    
-    lulc2pie <- lulc2pie %>%
-      mutate(PAL = case_when(
-        LULC == "Trees" ~ "#397d49",
-        LULC == "Grass" ~ "#88B053",
-        LULC == "Crops" ~ "#e49635",
-        LULC == "Shrub/Scrub" ~ "#dfc35a",
-        LULC == "Built" ~ "#c4281b",
-        LULC == "Bare" ~ "#a59b8f"
-      ))
-    
-    p <- plot_ly(lulc2pie, 
-                 labels = ~LULC, 
-                 values = ~PCT, 
-                 textinfo = "percent",
-                 hoverinfo = "text",
-                 text = paste(lulc2pie$LULC,
-                              "<br>",
-                              lulc2pie$PCT, "%"),
-                 marker = list(colors = ~PAL),
-                 sort = FALSE,
-                 type = "pie")
-    
-    p
+    if(nrow(lulc2map_df) > 0) {
+      
+      lulc2pie <- data.frame(LULC = c("Trees", "Grass", "Crops", "Shrub/Scrub", "Built", "Bare"),
+                             PCT = c(sum((lulc2map$LULC == 1) == TRUE, na.rm = TRUE) / sum(!is.na(lulc2map$LULC)) * 100,
+                                     sum((lulc2map$LULC == 2) == TRUE, na.rm = TRUE) / sum(!is.na(lulc2map$LULC)) * 100,
+                                     sum((lulc2map$LULC == 3) == TRUE, na.rm = TRUE) / sum(!is.na(lulc2map$LULC)) * 100,
+                                     sum((lulc2map$LULC == 4) == TRUE, na.rm = TRUE) / sum(!is.na(lulc2map$LULC)) * 100,
+                                     sum((lulc2map$LULC == 5) == TRUE, na.rm = TRUE) / sum(!is.na(lulc2map$LULC)) * 100,
+                                     sum((lulc2map$LULC == 6) == TRUE, na.rm = TRUE) / sum(!is.na(lulc2map$LULC)) * 100))
+      
+      lulc2pie$PCT <- round(lulc2pie$PCT, 1)
+      
+      lulc2pie <- lulc2pie[lulc2pie$PCT != 0, ]
+      
+      lulc2pie <- lulc2pie %>%
+        mutate(PAL = case_when(
+          LULC == "Trees" ~ "#397d49",
+          LULC == "Grass" ~ "#88B053",
+          LULC == "Crops" ~ "#e49635",
+          LULC == "Shrub/Scrub" ~ "#dfc35a",
+          LULC == "Built" ~ "#c4281b",
+          LULC == "Bare" ~ "#a59b8f"
+        ))
+      
+      p <- plot_ly(lulc2pie, 
+                   labels = ~LULC, 
+                   values = ~PCT, 
+                   textinfo = "percent",
+                   hoverinfo = "text",
+                   text = paste(lulc2pie$LULC,
+                                "<br>",
+                                lulc2pie$PCT, "%"),
+                   marker = list(colors = ~PAL),
+                   sort = FALSE,
+                   type = "pie")
+      
+      p
+    }
   })
+  
+  # # first add ability to filter by land cover type
+  # 
+  # output$graph_lulc <- renderPlotly({
+  #   lulc2graph <- lulc %>%
+  #     filter(NAME == input$select_ws,
+  #            MONTH == input$select_mo) 
+  #   
+  #   lulc4graph_df <- lulc %>%
+  #     filter(
+  #            MONTH == 12) 
+  #   
+  #   if(nrow(lulc4graph_df) > 0) {
+  #     lulc4graph <- lulc4graph_df %>%
+  #       dplyr::select(LULC, YEAR, X, Y) %>%
+  #       st_as_sf(coords = c("X", "Y"), crs = 4326) %>%
+  #       mutate(LULC = factor(as.character(LULC), levels = c(1, 2, 3, 4, 5, 6))) %>%
+  #       group_by(YEAR) %>%
+  #       st_rasterize()
+  #   }
+  #   
+  #   sum((lulc4graph$LULC == 2) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100
+  # 
+  #   sum((lulc4graph$LULC == 2 & lulc4graph$YEAR == 2023) == TRUE, na.rm = TRUE)
+  #   
+  #   sum((lulc4graph$YEAR == 2020) == TRUE, na.rm = TRUE)
+  #   
+  #   x <- list(
+  #     title = "<b>Year</b>"
+  #   )
+  #   y <- list(
+  #     title = "<b>% Vegetation</b>",
+  #     tickformat = "digits"
+  #   )
+  # 
+  #   p <- plot_ly(ws2graph,
+  #                x = ~YEAR,
+  #                y = ~LU_PCT,
+  #                line = list(color = LULC)),
+  #                type = "scatter",
+  #                mode = "lines") %>%
+  #     layout(xaxis = x, yaxis = y)
+  #   p
+  # })
+  
+  ndvi2map_df <- ndvi %>%
+    filter(NAME == input$select_ws,
+           YEAR == input$select_yr,
+           MONTH == input$select_mo) 
+  
+  if(nrow(ndvi2map_df) > 0) {
+    ndvi2map <- ndvi2map_df %>%
+      dplyr::select(NDVI, X, Y) %>%
+      st_as_sf(coords = c("X", "Y"), crs = 4326) %>%
+      st_rasterize()
+    
+    pal_ndvi <- colorNumeric(palette = "Greens",
+                             na.color = "transparent",
+                             domain = ndvi2map$NDVI)
+  }
   
   output$map_ndvi <- renderLeaflet({
     leaflet() %>%
@@ -115,6 +178,22 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
                 lat2 = unname(st_bbox(ws2map)$ymax)
       ) 
   })
+  
+  if(nrow(ndvi2map_df) > 0) {
+    leafletProxy("map_ndvi", session) %>%
+      clearGroup(group = "NDVI") %>%
+      removeControl(layerId = "NDVI_legend") %>%
+      addStarsImage(ndvi2map, colors = pal_ndvi, group = "NDVI") %>%
+      addLegend(pal = pal_ndvi,
+                values = ndvi2map$NDVI,
+                opacity = 1,
+                title = "NDVI",
+                layerId = "NDVI_legend")
+  } else {
+    leafletProxy("map_ndvi", session) %>%
+      clearGroup(group = "NDVI") %>%
+      removeControl(layerId = "NDVI_legend")
+  }
   
   # observeEvent(input$select_lulc, {
   #   lulc_type <-  reactive({

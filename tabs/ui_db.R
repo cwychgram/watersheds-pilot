@@ -47,7 +47,7 @@ ui_db <- fluidPage(
                plotlyOutput("pie")
         ),
         column(width = 6,
-               # plotlyOutput("graph")
+               plotlyOutput("graph_lulc")
         )
       )
     )

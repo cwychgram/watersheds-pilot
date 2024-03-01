@@ -59,3 +59,5 @@ library(tidyr)
 ws <- st_read("data/ws-pilot-control.shp")
 
 lulc <- fread("data/babile-gutu-lulc.csv")
+
+ndvi <- fread("data/babile-gutu-ndvi.csv")
