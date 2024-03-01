@@ -105,50 +105,70 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
       p
     }
   })
-  
-  # # first add ability to filter by land cover type
-  # 
-  # output$graph_lulc <- renderPlotly({
-  #   lulc2graph <- lulc %>%
-  #     filter(NAME == input$select_ws,
-  #            MONTH == input$select_mo) 
-  #   
-  #   lulc4graph_df <- lulc %>%
-  #     filter(
-  #            MONTH == 12) 
-  #   
-  #   if(nrow(lulc4graph_df) > 0) {
-  #     lulc4graph <- lulc4graph_df %>%
-  #       dplyr::select(LULC, YEAR, X, Y) %>%
-  #       st_as_sf(coords = c("X", "Y"), crs = 4326) %>%
-  #       mutate(LULC = factor(as.character(LULC), levels = c(1, 2, 3, 4, 5, 6))) %>%
-  #       group_by(YEAR) %>%
-  #       st_rasterize()
-  #   }
-  #   
-  #   sum((lulc4graph$LULC == 2) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100
-  # 
-  #   sum((lulc4graph$LULC == 2 & lulc4graph$YEAR == 2023) == TRUE, na.rm = TRUE)
-  #   
-  #   sum((lulc4graph$YEAR == 2020) == TRUE, na.rm = TRUE)
-  #   
-  #   x <- list(
-  #     title = "<b>Year</b>"
-  #   )
-  #   y <- list(
-  #     title = "<b>% Vegetation</b>",
-  #     tickformat = "digits"
-  #   )
-  # 
-  #   p <- plot_ly(ws2graph,
-  #                x = ~YEAR,
-  #                y = ~LU_PCT,
-  #                line = list(color = LULC)),
-  #                type = "scatter",
-  #                mode = "lines") %>%
-  #     layout(xaxis = x, yaxis = y)
-  #   p
-  # })
+
+  output$graph_lulc <- renderPlotly({
+    lulc4graph_df <- lulc %>%
+      filter(NAME == input$select_ws,
+             MONTH == input$select_mo)
+    
+    if(nrow(lulc4graph_df) > 0) {
+      func4graph <- function(yr) {
+        lulc4graph <- lulc4graph_df %>%
+          filter(YEAR == yr) %>%
+          dplyr::select(LULC, X, Y) %>%
+          st_as_sf(coords = c("X", "Y"), crs = 4326) %>%
+          mutate(LULC = factor(as.character(LULC), levels = c(1, 2, 3, 4, 5, 6))) %>%
+          st_rasterize()
+        lulc2graph <- data.frame(LULC = c("Trees", "Grass", "Crops", "Shrub/Scrub", "Built", "Bare"),
+                               PCT = c(sum((lulc4graph$LULC == 1) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
+                                       sum((lulc4graph$LULC == 2) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
+                                       sum((lulc4graph$LULC == 3) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
+                                       sum((lulc4graph$LULC == 4) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
+                                       sum((lulc4graph$LULC == 5) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
+                                       sum((lulc4graph$LULC == 6) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100))
+
+        lulc2graph <- lulc2graph %>%
+          mutate(PCT = round(PCT, 1),
+                 YEAR = yr) %>%
+          filter(PCT != 0)
+      }
+      # lulc2graph_2018 <- func4graph(2018)
+      lulc2graph_2019 <- func4graph(2019)
+      lulc2graph_2020 <- func4graph(2020)
+      lulc2graph_2021 <- func4graph(2021)
+      lulc2graph_2022 <- func4graph(2022)
+      lulc2graph_2023 <- func4graph(2023)
+      
+      lulc2graph_all <- rbind(
+        # lulc2graph_2018, 
+        lulc2graph_2019, lulc2graph_2020, lulc2graph_2021, 
+        lulc2graph_2022, lulc2graph_2023)
+      
+      x <- list(
+        title = "<b>Year</b>"
+      )
+      y <- list(
+        title = "<b>% LULC</b>",
+        tickformat = "digits"
+      )
+      
+      p <- lulc2graph_all %>%
+        group_by(LULC) %>%
+        plot_ly(x = ~YEAR,
+                y = ~PCT,
+                color = ~LULC,
+                colors = c("Trees" = "#397d49",
+                           "Grass" = "#88B053",
+                           "Crops" = "#e49635",
+                           "Shrub/Scrub" = "#dfc35a",
+                           "Built" = "#c4281b",
+                           "Bare" = "#a59b8f"),
+                type = "scatter",
+                mode = "lines") %>%
+        layout(xaxis = x, yaxis = y)
+      p
+    }
+  })
   
   ndvi2map_df <- ndvi %>%
     filter(NAME == input$select_ws,
@@ -194,40 +214,4 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
       clearGroup(group = "NDVI") %>%
       removeControl(layerId = "NDVI_legend")
   }
-  
-  # observeEvent(input$select_lulc, {
-  #   lulc_type <-  reactive({
-  #     lulc %>%
-  #       filter(LULC %in% input$select_lulc & CW %in% input$select_ws)
-  #   })
-  #   
-  #   pal_lulc <- colorFactor(
-  #     palette = c("#397d49","#88B053","#e49635","#dfc35a","#c4281b","#a59b8f"),
-  #     domain = lulc$LULC,
-  #   )
-  #   
-  #   if(!is.null(input$select_lulc) & nrow(lulc_type()) > 0) {
-  #     leafletProxy("map", session) %>%
-  #       clearGroup(group = "LULC") %>%
-  #       removeControl(layerId = "LULCLegend") %>%
-  #       addPolygons(data = lulc_type(),
-  #                   label = ~LULC,
-  #                   color = ~pal_lulc(LULC),
-  #                   fillOpacity = 1,
-  #                   stroke = FALSE,
-  #                   group = "LULC") %>%
-  #       addLegend(position = "topright",
-  #                 pal = pal_lulc,
-  #                 values = lulc_type()$LULC,
-  #                 title = "LULC Type",
-  #                 opacity = 1,
-  #                 layerId = "LULCLegend"
-  #       )
-  #   } else {
-  #     leafletProxy("map", session) %>%
-  #       clearGroup(group = "LULC") %>%
-  #       removeControl(layerId = "LULCLegend")
-  #   }
-  #   
-  # }, ignoreNULL = FALSE)
 }, ignoreInit = TRUE)

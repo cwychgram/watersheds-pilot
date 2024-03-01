@@ -47,7 +47,13 @@ ui_db <- fluidPage(
                plotlyOutput("pie")
         ),
         column(width = 6,
+        )
+      ),
+      fluidRow(
+        column(width = 6,
                plotlyOutput("graph_lulc")
+        ),
+        column(width = 6,
         )
       )
     )

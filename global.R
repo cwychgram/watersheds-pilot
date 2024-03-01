@@ -13,40 +13,40 @@ library(tidyr)
 
 # # merge watersheds
 # 
-# pilot1 <- st_read("data/boundaries/Pilot watersheds/Babile-Gutu CW.shp") %>% 
+# pilot1 <- st_read("data/boundaries/Pilot watersheds/Babile-Gutu CW.shp") %>%
 #   st_transform(4326) %>%
 #   select(geometry) %>%
-#   mutate(NAME = "Babile Gutu", 
+#   mutate(NAME = "Babile Gutu",
 #          TYPE = "Pilot",
 #          AGRO = "Lowland")
-# pilot2 <- st_read("data/boundaries/Pilot watersheds/Jarso-Worra-Chella CW.shp") %>% 
+# pilot2 <- st_read("data/boundaries/Pilot watersheds/Jarso-Worra-Chella CW.shp") %>%
 #   st_transform(4326) %>%
 #   select(geometry) %>%
-#   mutate(NAME = "Jarso Worra Chella", 
+#   mutate(NAME = "Jarso Worra Chella",
 #          TYPE = "Pilot",
 #          AGRO = "Highland")
-# pilot3 <- st_read("data/boundaries/Pilot watersheds/Meta-Hawi Gudina CW.shp") %>% 
+# pilot3 <- st_read("data/boundaries/Pilot watersheds/Meta-Hawi Gudina CW.shp") %>%
 #   st_transform(4326) %>%
 #   select(geometry) %>%
-#   mutate(NAME = "Meta Hawi Gudina", 
+#   mutate(NAME = "Meta Hawi Gudina",
 #          TYPE = "Pilot",
 #          AGRO = "Midland")
-# pilot4 <- st_read("data/boundaries/Pilot watersheds/Midhega Tolla- Umer Bula CW.shp") %>% 
+# pilot4 <- st_read("data/boundaries/Pilot watersheds/Midhega Tolla- Umer Bula CW.shp") %>%
 #   st_transform(4326) %>%
 #   select(geometry) %>%
-#   mutate(NAME = "Midega Tola Umer Bula", 
+#   mutate(NAME = "Midega Tola Umer Bula",
 #          TYPE = "Pilot",
 #          AGRO = "Lowland")
-# control1 <- st_read("data/boundaries/Control Sites for pilots/Finxabas MWS.shp") %>% 
+# control1 <- st_read("data/boundaries/Control Sites for pilots/Finxabas MWS.shp") %>%
 #   st_transform(4326) %>%
 #   select(geometry) %>%
-#   mutate(NAME = "Meta Finxabas", 
+#   mutate(NAME = "Meta Finxabas",
 #          TYPE = "Control",
 #          AGRO = "Midland")
-# control2 <- st_read("data/boundaries/Control Sites for pilots/QUUFA MWS.shp") %>% 
+# control2 <- st_read("data/boundaries/Control Sites for pilots/QUUFA MWS.shp") %>%
 #   st_transform(4326) %>%
 #   select(geometry) %>%
-#   mutate(NAME = "Midega Tola Quufa", 
+#   mutate(NAME = "Midega Tola Quufa",
 #          TYPE = "Control",
 #          AGRO = "Lowland")
 # 
