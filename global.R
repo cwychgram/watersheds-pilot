@@ -58,6 +58,10 @@ library(tidyr)
 
 ws <- st_read("data/ws-pilot-control.shp")
 
-lulc <- fread("data/babile-gutu-lulc.csv")
+# lulc <- fread("data/rfsa-lulc.csv")
+# lulc <- lulc[!is.na(lulc$X), ]
+# write.csv(lulc, "rfsa-lulc.csv", row.names = FALSE)
+lulc <- fread("data/rfsa-lulc.csv")
+# saveRDS(lulc, file = "data/rfsa-lulc.rds")
 
 ndvi <- fread("data/babile-gutu-ndvi.csv")

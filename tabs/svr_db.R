@@ -36,16 +36,29 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
   }
   
   output$map_lulc <- renderLeaflet({
-    leaflet() %>%
-      addProviderTiles(providers$CartoDB.Positron) %>% 
-      addScaleBar() %>%
-      addResetMapButton() %>%
-      clearShapes() %>%
-      fitBounds(lng1 = unname(st_bbox(ws2map)$xmin),
-                lat1 = unname(st_bbox(ws2map)$ymin),
-                lng2 = unname(st_bbox(ws2map)$xmax),
-                lat2 = unname(st_bbox(ws2map)$ymax)
-      ) 
+    if (ws2map$TYPE == "Pilot") {
+      leaflet() %>%
+        addProviderTiles(providers$CartoDB.Positron) %>% 
+        addScaleBar() %>%
+        addResetMapButton() %>%
+        clearShapes() %>%
+        fitBounds(lng1 = unname(st_bbox(ws2map)$xmin),
+                  lat1 = unname(st_bbox(ws2map)$ymin),
+                  lng2 = unname(st_bbox(ws2map)$xmax),
+                  lat2 = unname(st_bbox(ws2map)$ymax)
+        ) 
+    } else {
+      leaflet() %>%
+        addProviderTiles(providers$CartoDB.Positron) %>% 
+        addScaleBar() %>%
+        addResetMapButton() %>%
+        clearShapes() %>%
+        fitBounds(lng1 = unname(st_bbox(ws2map)$xmin - .01),
+                  lat1 = unname(st_bbox(ws2map)$ymin - .01),
+                  lng2 = unname(st_bbox(ws2map)$xmax + .01),
+                  lat2 = unname(st_bbox(ws2map)$ymax + .01)
+        ) 
+    }
   })
   
   if(nrow(lulc2map_df) > 0) {
