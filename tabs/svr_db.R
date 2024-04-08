@@ -192,10 +192,22 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
            MONTH == input$select_mo) 
   
   if(nrow(ndvi2map_df) > 0) {
-    ndvi2map <- ndvi2map_df %>%
-      dplyr::select(NDVI, X, Y) %>%
-      st_as_sf(coords = c("X", "Y"), crs = 4326) %>%
-      st_rasterize()
+    if (input$select_ws == "Meta Hawi Gudina") {
+      ndvi2map <- ndvi2map_df %>%
+        dplyr::select(NDVI, X, Y) %>%
+        st_as_sf(coords = c("X", "Y"), crs = 4326) %>%
+        st_rasterize(template = read_stars("data/hawi.tif"))
+    } else if (input$select_ws == "Meta Finxabas") {
+      ndvi2map <- ndvi2map_df %>%
+        dplyr::select(NDVI, X, Y) %>%
+        st_as_sf(coords = c("X", "Y"), crs = 4326) %>%
+        st_rasterize(template = read_stars("data/finxabas.tif"))
+    } else {
+      ndvi2map <- ndvi2map_df %>%
+        dplyr::select(NDVI, X, Y) %>%
+        st_as_sf(coords = c("X", "Y"), crs = 4326) %>%
+        st_rasterize()
+    }
     
     pal_ndvi <- colorNumeric(palette = "Greens",
                              na.color = "transparent",
@@ -203,16 +215,29 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
   }
   
   output$map_ndvi <- renderLeaflet({
-    leaflet() %>%
-      addProviderTiles(providers$CartoDB.Positron) %>% 
-      addScaleBar() %>%
-      addResetMapButton() %>%
-      clearShapes() %>%
-      fitBounds(lng1 = unname(st_bbox(ws2map)$xmin),
-                lat1 = unname(st_bbox(ws2map)$ymin),
-                lng2 = unname(st_bbox(ws2map)$xmax),
-                lat2 = unname(st_bbox(ws2map)$ymax)
-      ) 
+    if (ws2map$TYPE == "Pilot") {
+      leaflet() %>%
+        addProviderTiles(providers$CartoDB.Positron) %>% 
+        addScaleBar() %>%
+        addResetMapButton() %>%
+        clearShapes() %>%
+        fitBounds(lng1 = unname(st_bbox(ws2map)$xmin),
+                  lat1 = unname(st_bbox(ws2map)$ymin),
+                  lng2 = unname(st_bbox(ws2map)$xmax),
+                  lat2 = unname(st_bbox(ws2map)$ymax)
+        ) 
+    } else {
+      leaflet() %>%
+        addProviderTiles(providers$CartoDB.Positron) %>% 
+        addScaleBar() %>%
+        addResetMapButton() %>%
+        clearShapes() %>%
+        fitBounds(lng1 = unname(st_bbox(ws2map)$xmin - .01),
+                  lat1 = unname(st_bbox(ws2map)$ymin - .01),
+                  lng2 = unname(st_bbox(ws2map)$xmax + .01),
+                  lat2 = unname(st_bbox(ws2map)$ymax + .01)
+        ) 
+    } 
   })
   
   if(nrow(ndvi2map_df) > 0) {
