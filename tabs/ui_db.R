@@ -21,13 +21,14 @@ ui_db <- fluidPage(
                       animate = TRUE,
                       width = "100%"
       ),
-      sliderTextInput("select_mo",
-                      label = "Select a month:",
-                      choices = 1:12,
-                      selected = 1,
-                      grid = TRUE,
-                      animate = TRUE,
-                      width = "100%"
+      selectInput("select_szn",
+                  label = "Select a season:",
+                  choices = c("Kiremt or Meher (Summer)",
+                              "Belg (Autumn)",
+                              "Bega (Winter)",
+                              "Tseday (Spring)"),
+                  selected = "Kiremt or Meher (Summer)",
+                  width = "100%"
       )
     ),
     mainPanel(
@@ -35,27 +36,58 @@ ui_db <- fluidPage(
       fluidRow(
         column(
           width = 6,
-          leafletOutput("map_lulc")
+          h4("Land Use/Land Cover"),
+          tabsetPanel(
+            tabPanel("Map",
+                     leafletOutput("map_lulc")),
+            tabPanel("Pie Chart",
+                     plotlyOutput("pie")),
+            tabPanel("Trend")
+          )
         ),
         column(
           width = 6,
-          leafletOutput("map_ndvi")
+          h4("NDVI"),
+          tabsetPanel(
+            tabPanel("Map",
+                      leafletOutput("map_ndvi")),
+            tabPanel("Season Average",
+                     h5(htmlOutput("avg_ndvi")),
+                     dataTableOutput("table_ndvi")),
+            tabPanel("Time Series",
+                     dygraphOutput("graph_ndvi"))
+          )
         )
       ),
       fluidRow(
-        column(width = 6,
-               plotlyOutput("pie")
-        ),
-        column(width = 6,
-        )
-      ),
-      fluidRow(
-        column(width = 6,
-               plotlyOutput("graph_lulc")
-        ),
-        column(width = 6,
+        column(
+          width = 6,
+          h4("Precipitation"),
+          tabsetPanel(
+            tabPanel("Season Total",
+                     h5(htmlOutput("tot_precip")),
+                     dataTableOutput("table_precip")),
+            tabPanel("Time Series",
+                     dygraphOutput("graph_precip"))
+          )
         )
       )
+      # ,
+      # fluidRow(
+      #   column(width = 6,
+      #          plotlyOutput("pie")
+      #   ),
+      #   column(width = 6,
+      #   )
+      # )
+      # ,
+      # fluidRow(
+      #   column(width = 6,
+      #          plotlyOutput("graph_lulc")
+      #   ),
+      #   column(width = 6,
+      #   )
+      # )
     )
   )
 )

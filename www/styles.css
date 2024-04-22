@@ -20,3 +20,7 @@
 .irs-grid-pol.small {
   height: 0px;
 }
+
+tfoot {
+  visibility: hidden;
+}

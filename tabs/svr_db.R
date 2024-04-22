@@ -12,14 +12,14 @@ observe({
                     choices = ws_choices())
 })
 
-observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
+observeEvent(c(input$select_ws, input$select_yr, input$select_szn), {
   ws2map <- ws %>%
     filter(NAME == input$select_ws)
   
   lulc2map_df <- lulc %>%
     filter(NAME == input$select_ws,
            YEAR == input$select_yr,
-           MONTH == input$select_mo) 
+           SEASON == input$select_szn) 
   
   if(nrow(lulc2map_df) > 0) {
     lulc2map <- lulc2map_df %>%
@@ -65,12 +65,12 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
     leafletProxy("map_lulc", session) %>%
       clearGroup(group = "LULC") %>%
       removeControl(layerId = "LULC_legend") %>%
-    addStarsImage(lulc2map, colors = pal_lulc, group = "LULC") %>%
-    addLegend(colors = c("#397d49","#88B053","#e49635","#dfc35a","#c4281b","#a59b8f"),
-              labels = c("Trees", "Grass", "Crops", "Shrub/Scrub", "Built", "Bare"),
-              opacity = 1,
-              title = "LULC",
-              layerId = "LULC_legend")
+      addStarsImage(lulc2map, colors = pal_lulc, group = "LULC") %>%
+      leaflet::addLegend(colors = c("#397d49","#88B053","#e49635","#dfc35a","#c4281b","#a59b8f"),
+                         labels = c("Trees", "Grass", "Crops", "Shrub/Scrub", "Built", "Bare"),
+                         opacity = 1,
+                         title = "LULC",
+                         layerId = "LULC_legend")
   } else {
     leafletProxy("map_lulc", session) %>%
       clearGroup(group = "LULC") %>%
@@ -118,78 +118,78 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
       p
     }
   })
-
-  output$graph_lulc <- renderPlotly({
-    lulc4graph_df <- lulc %>%
-      filter(NAME == input$select_ws,
-             MONTH == input$select_mo)
-    
-    if(nrow(lulc4graph_df) > 0) {
-      func4graph <- function(yr) {
-        lulc4graph <- lulc4graph_df %>%
-          filter(YEAR == yr) %>%
-          dplyr::select(LULC, X, Y) %>%
-          st_as_sf(coords = c("X", "Y"), crs = 4326) %>%
-          mutate(LULC = factor(as.character(LULC), levels = c(1, 2, 3, 4, 5, 6))) %>%
-          st_rasterize()
-        lulc2graph <- data.frame(LULC = c("Trees", "Grass", "Crops", "Shrub/Scrub", "Built", "Bare"),
-                               PCT = c(sum((lulc4graph$LULC == 1) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
-                                       sum((lulc4graph$LULC == 2) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
-                                       sum((lulc4graph$LULC == 3) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
-                                       sum((lulc4graph$LULC == 4) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
-                                       sum((lulc4graph$LULC == 5) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
-                                       sum((lulc4graph$LULC == 6) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100))
-
-        lulc2graph <- lulc2graph %>%
-          mutate(PCT = round(PCT, 1),
-                 YEAR = yr) %>%
-          filter(PCT != 0)
-      }
-      # lulc2graph_2018 <- func4graph(2018)
-      lulc2graph_2019 <- func4graph(2019)
-      lulc2graph_2020 <- func4graph(2020)
-      lulc2graph_2021 <- func4graph(2021)
-      lulc2graph_2022 <- func4graph(2022)
-      lulc2graph_2023 <- func4graph(2023)
-      
-      lulc2graph_all <- rbind(
-        # lulc2graph_2018, 
-        lulc2graph_2019, lulc2graph_2020, lulc2graph_2021, 
-        lulc2graph_2022, lulc2graph_2023)
-      
-      lulc2graph_all <- lulc2graph_all %>%
-        mutate(LULC = factor(LULC, levels = c("Trees", "Grass", "Crops", "Shrub/Scrub", "Built", "Bare")))
-      
-      x <- list(
-        title = "<b>Year</b>"
-      )
-      y <- list(
-        title = "<b>% LULC</b>",
-        tickformat = "digits"
-      )
-      
-      p <- lulc2graph_all %>%
-        group_by(LULC) %>%
-        plot_ly(x = ~YEAR,
-                y = ~PCT,
-                color = ~LULC,
-                colors = c("Trees" = "#397d49",
-                           "Grass" = "#88B053",
-                           "Crops" = "#e49635",
-                           "Shrub/Scrub" = "#dfc35a",
-                           "Built" = "#c4281b",
-                           "Bare" = "#a59b8f"),
-                type = "scatter",
-                mode = "lines") %>%
-        layout(xaxis = x, yaxis = y)
-      p
-    }
-  })
+  
+  # output$graph_lulc <- renderPlotly({
+  #   lulc4graph_df <- lulc %>%
+  #     filter(NAME == input$select_ws,
+  #            SEASON == input$select_szn)
+  #   
+  #   if(nrow(lulc4graph_df) > 0) {
+  #     func4graph <- function(yr) {
+  #       lulc4graph <- lulc4graph_df %>%
+  #         filter(YEAR == yr) %>%
+  #         dplyr::select(LULC, X, Y) %>%
+  #         st_as_sf(coords = c("X", "Y"), crs = 4326) %>%
+  #         mutate(LULC = factor(as.character(LULC), levels = c(1, 2, 3, 4, 5, 6))) %>%
+  #         st_rasterize()
+  #       lulc2graph <- data.frame(LULC = c("Trees", "Grass", "Crops", "Shrub/Scrub", "Built", "Bare"),
+  #                              PCT = c(sum((lulc4graph$LULC == 1) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
+  #                                      sum((lulc4graph$LULC == 2) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
+  #                                      sum((lulc4graph$LULC == 3) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
+  #                                      sum((lulc4graph$LULC == 4) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
+  #                                      sum((lulc4graph$LULC == 5) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100,
+  #                                      sum((lulc4graph$LULC == 6) == TRUE, na.rm = TRUE) / sum(!is.na(lulc4graph$LULC)) * 100))
+  # 
+  #       lulc2graph <- lulc2graph %>%
+  #         mutate(PCT = round(PCT, 1),
+  #                YEAR = yr) %>%
+  #         filter(PCT != 0)
+  #     }
+  #     # lulc2graph_2018 <- func4graph(2018)
+  #     lulc2graph_2019 <- func4graph(2019)
+  #     lulc2graph_2020 <- func4graph(2020)
+  #     lulc2graph_2021 <- func4graph(2021)
+  #     lulc2graph_2022 <- func4graph(2022)
+  #     lulc2graph_2023 <- func4graph(2023)
+  #     
+  #     lulc2graph_all <- rbind(
+  #       # lulc2graph_2018, 
+  #       lulc2graph_2019, lulc2graph_2020, lulc2graph_2021, 
+  #       lulc2graph_2022, lulc2graph_2023)
+  #     
+  #     lulc2graph_all <- lulc2graph_all %>%
+  #       mutate(LULC = factor(LULC, levels = c("Trees", "Grass", "Crops", "Shrub/Scrub", "Built", "Bare")))
+  #     
+  #     x <- list(
+  #       title = "<b>Year</b>"
+  #     )
+  #     y <- list(
+  #       title = "<b>% LULC</b>",
+  #       tickformat = "digits"
+  #     )
+  #     
+  #     p <- lulc2graph_all %>%
+  #       group_by(LULC) %>%
+  #       plot_ly(x = ~YEAR,
+  #               y = ~PCT,
+  #               color = ~LULC,
+  #               colors = c("Trees" = "#397d49",
+  #                          "Grass" = "#88B053",
+  #                          "Crops" = "#e49635",
+  #                          "Shrub/Scrub" = "#dfc35a",
+  #                          "Built" = "#c4281b",
+  #                          "Bare" = "#a59b8f"),
+  #               type = "scatter",
+  #               mode = "lines") %>%
+  #       layout(xaxis = x, yaxis = y)
+  #     p
+  #   }
+  # })
   
   ndvi2map_df <- ndvi %>%
     filter(NAME == input$select_ws,
            YEAR == input$select_yr,
-           MONTH == input$select_mo) 
+           SEASON == input$select_szn) 
   
   if(nrow(ndvi2map_df) > 0) {
     if (input$select_ws == "Meta Hawi Gudina") {
@@ -245,7 +245,7 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
       clearGroup(group = "NDVI") %>%
       removeControl(layerId = "NDVI_legend") %>%
       addStarsImage(ndvi2map, colors = pal_ndvi, group = "NDVI") %>%
-      addLegend(pal = pal_ndvi,
+      leaflet::addLegend(pal = pal_ndvi,
                 values = ndvi2map$NDVI,
                 opacity = 1,
                 title = "NDVI",
@@ -255,4 +255,65 @@ observeEvent(c(input$select_ws, input$select_yr, input$select_mo), {
       clearGroup(group = "NDVI") %>%
       removeControl(layerId = "NDVI_legend")
   }
+  
+  ndvi2table <- reactive({
+    ndvi4table %>%
+      filter(NAME == input$select_ws,
+             YEAR == input$select_yr,
+             SEASON == input$select_szn) %>%
+      arrange(MONTH) %>%
+      dplyr::select(MONTH_NAME, NDVI) %>%
+      rename(Month = MONTH_NAME)
+  })
+  
+  output$table_ndvi <- renderDataTable(ndvi2table(), 
+                                       options = list(dom = "t"))
+  
+  output$avg_ndvi <- renderText({
+    paste("<B>Average</B>: ", round(mean(ndvi2table()$NDVI), 2))
+  })
+  
+  output$graph_ndvi <- renderDygraph({
+    ndvi2graph <- ndvi4table %>%
+      filter(NAME == input$select_ws)
+    ndvi2graph$Date <- paste(ndvi2graph$YEAR, ndvi2graph$MONTH, sep = "-")
+    ndvi2graph$Date <- ym(ndvi2graph$Date)
+    print(ndvi2graph$Date)
+    ndvi2graph <- xts(ndvi2graph$NDVI, ndvi2graph$Date)
+    ndvi2graph %>%
+      dygraph(xlab = "Date", ylab = "NDVI") %>%
+      dyRangeSelector() %>%
+      dyOptions(sigFigs = 2)
+  })
+  
+  precip2table <- reactive({
+    precip %>%
+      filter(NAME == input$select_ws,
+             YEAR == input$select_yr,
+             SEASON == input$select_szn) %>%
+      arrange(MONTH) %>%
+      dplyr::select(MONTH_NAME, P_MM) %>%
+      rename(Month = MONTH_NAME,
+             "Precipitation (mm)" = P_MM)
+  })
+
+  output$table_precip <- renderDataTable(precip2table(),
+                                       options = list(dom = "t"))
+
+  output$tot_precip <- renderText({
+    paste("<B>Total (mm)</B>: ", sum(precip2table()$"Precipitation (mm)"))
+  })
+  
+  output$graph_precip <- renderDygraph({
+    precip2graph <- precip %>%
+      filter(NAME == input$select_ws)
+    precip2graph$Date <- paste(precip2graph$YEAR, precip2graph$MONTH, sep = "-")
+    precip2graph$Date <- ym(precip2graph$Date)
+    print(precip2graph$Date)
+    precip2graph <- xts(precip2graph$P_MM, precip2graph$Date)
+    precip2graph %>%
+      dygraph(xlab = "Date", ylab = "Precipitation (mm)") %>%
+      dyRangeSelector() 
+  })
+  
 }, ignoreInit = TRUE)
